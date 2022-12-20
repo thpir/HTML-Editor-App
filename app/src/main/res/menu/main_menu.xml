@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_open"
+        android:icon="@drawable/ic_baseline_file_open_24"
+        android:title="@string/action_open_text"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_save"
+        android:icon="@drawable/ic_baseline_save_24"
+        android:title="@string/action_save_text"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/action_save_as"
+        android:icon="@drawable/ic_baseline_save_as_24"
+        android:title="@string/action_save_as_text"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/action_new"
+        android:icon="@drawable/ic_baseline_create_24"
+        android:title="@string/action_new_text"
+        app:showAsAction="ifRoom"/>
+
+</menu>
