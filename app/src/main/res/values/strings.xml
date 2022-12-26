@@ -1,8 +1,11 @@
 <resources>
-    <string name="app_name">&#60;HTML/&#62; editor</string>
+    <string name="app_name">HTML editor</string>
     <string name="et_type_your_code_here">Type your code here</string>
     <string name="action_open_text">Open File</string>
     <string name="action_save_text">Save File</string>
     <string name="action_save_as_text">Save File As</string>
     <string name="action_new_text">New File</string>
+    <string name="action_open_template_text">Open Template</string>
+    <string name="action_about_text">About This App</string>
+    <string name="app_logo_text">App logo</string>
 </resources>

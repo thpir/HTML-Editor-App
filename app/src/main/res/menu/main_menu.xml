@@ -25,4 +25,16 @@
         android:title="@string/action_new_text"
         app:showAsAction="ifRoom"/>
 
+    <item
+        android:id="@+id/action_template"
+        android:icon="@drawable/ic_baseline_create_24"
+        android:title="@string/action_open_template_text"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_about"
+        android:icon="@drawable/ic_baseline_info_24"
+        android:title="@string/action_about_text"
+        app:showAsAction="never"/>
+
 </menu>
