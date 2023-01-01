@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context=".MainActivity">
     <include
@@ -12,6 +13,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@+id/my_toolbar"
         android:scrollbars="vertical">
 
         <LinearLayout
@@ -28,7 +30,7 @@
                 android:paddingStart="5dp"
                 android:paddingEnd="5dp"
                 android:background="@color/light_grey"
-                android:text="1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\n32\n33\n34\n35\n36\n37"
+                android:text="1"
                 android:textSize="20sp"
                 android:textAlignment="viewEnd"/>
 
@@ -50,14 +52,24 @@
                     android:autofillHints=""
                     android:inputType="textMultiLine"
                     android:gravity="top|start"
-                    android:minLines="37"
+                    android:minLines="1"
                     android:backgroundTint="@android:color/transparent"/>
 
             </HorizontalScrollView>
 
         </LinearLayout>
 
-
     </ScrollView>
 
-</LinearLayout>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:src="@drawable/ic_baseline_smart_display_24"
+        android:contentDescription="@string/fab_description"
+        android:layout_margin="16dp"
+        app:backgroundTint="@color/accent_app_color"/>
+
+</RelativeLayout>

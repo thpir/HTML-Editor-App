@@ -8,4 +8,8 @@
     <string name="action_open_template_text">Open Template</string>
     <string name="action_about_text">About This App</string>
     <string name="app_logo_text">App logo</string>
+    <string name="fab_description">display HTML page</string>
+    <string name="logo_thpir_text">Logo THPIR</string>
+    <string name="designed_and_created_by_text">Designed and created by:</string>
+    <string name="alert_text">App name: HTML Viewer\nDate: 28–12–2022\nVersion: HTML Editor V1.0.0\nAuthor: THPIR</string>
 </resources>

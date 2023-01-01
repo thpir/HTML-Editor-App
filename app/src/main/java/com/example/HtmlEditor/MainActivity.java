@@ -1,19 +1,34 @@
 package com.example.HtmlEditor;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.PopupMenu;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
@@ -31,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
     private Uri uri = null;
 
     private EditText mEditText;
+    private TextView mEditTextLineCount;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +57,42 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
 
+        mEditTextLineCount = findViewById(R.id.textViewLineNumbers);
         mEditText = findViewById(R.id.textViewCode);
+        mEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                // Nothing to do
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                // Nothing to do
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String lineCount = "";
+                String text = mEditText.getText().toString();
+                String[] lines = text.split("\n");
+                for (int j = 1; j <= lines.length; j++) {
+                    lineCount = lineCount + j + "\n";
+                }
+                mEditTextLineCount.setText(lineCount);
+            }
+        });
+
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(view -> {
+            if (uri != null) {
+                Intent intent = new Intent(MainActivity.this, HtmlViewerActivity.class);
+                intent.putExtra("uri", uri.toString());
+                startActivity(intent);
+            } else {
+                Snackbar.make(view, "First open or save a document", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
     }
 
     @Override
@@ -79,13 +131,21 @@ public class MainActivity extends AppCompatActivity {
             uri = null;
             return true;
         } else if (item.getItemId() == R.id.action_about) {
-            // TODO
+            inflatePopUp();
             return true;
         } else {
             // If we got here, the user's action was not recognized.
             // Invoke the superclass to handle it.
             return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void inflatePopUp() {
+        new AlertDialog.Builder(this, R.style.MyDialogTheme)
+                .setTitle("About")
+                .setView(R.layout.popup_about)
+                .setNegativeButton("OK", null)
+                .show();
     }
 
     private void readStoragePermission() {
