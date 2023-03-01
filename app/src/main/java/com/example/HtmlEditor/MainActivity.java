@@ -1,8 +1,8 @@
 package com.example.HtmlEditor;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
@@ -10,16 +10,9 @@ import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.PopupMenu;
-import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,20 +36,28 @@ public class MainActivity extends AppCompatActivity {
     private static final int WRITE_STORAGE_PERMISSION_REQUEST_CODE = 1000;
     private static final int PICK_FILE = 2;
     private static final int CREATE_FILE = 1;
-    private Uri uri = null;
-
+    private Uri mUri = null;
+    private String mUriString = "";
     private EditText mEditText;
     private TextView mEditTextLineCount;
-
+    // Shared Preferences
+    private SharedPreferences mSharedPreferences;
+    private final String mSharedPreferencesFile = "com.thpir.myenergydesk";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Toolbar setup
         Toolbar toolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
 
+        // Initialize the shared preferences
+        mSharedPreferences = getSharedPreferences(mSharedPreferencesFile, MODE_PRIVATE);
+        mUriString = mSharedPreferences.getString("URI", "");
+
+        // Initialize remaining widgets
         mEditTextLineCount = findViewById(R.id.textViewLineNumbers);
         mEditText = findViewById(R.id.textViewCode);
         mEditText.addTextChangedListener(new TextWatcher() {
@@ -82,17 +83,39 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Check if there is was a valid URI displayed when the app was previously killed, If present redisplay the file
+        try {
+            mUri = Uri.parse(mUriString);
+            String fileContent = readTextFromUri(mUri);
+            mEditText.setText(fileContent);
+        } catch (IOException e) {
+            e.printStackTrace();
+            mEditText.setText("");
+            mUri = null;
+            mUriString = "";
+            savedSharedPreferences();
+        }
+
+        // FAB setup
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(view -> {
-            if (uri != null) {
+            if (mUri != null) {
                 Intent intent = new Intent(MainActivity.this, HtmlViewerActivity.class);
-                intent.putExtra("uri", uri.toString());
+                intent.putExtra("uri", mUri.toString());
                 startActivity(intent);
             } else {
                 Snackbar.make(view, "First open or save a document", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mUriString = "";
+        if (mUri!= null) mUriString = mUri.toString();
+        savedSharedPreferences();
     }
 
     @Override
@@ -111,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
         } else if (item.getItemId() == R.id.action_save) {
             String content = mEditText.getText().toString();
             try {
-                alterDocument(uri, content);
+                alterDocument(mUri, content);
             } catch (Exception e) {
                 e.printStackTrace();
                 writeStoragePermission();
@@ -124,11 +147,11 @@ public class MainActivity extends AppCompatActivity {
             return true;
         } else if (item.getItemId() == R.id.action_new) {
             mEditText.setText("");
-            uri = null;
+            mUri = null;
             return true;
         } else if (item.getItemId() == R.id.action_template) {
             openTemplate();
-            uri = null;
+            mUri = null;
             return true;
         } else if (item.getItemId() == R.id.action_about) {
             inflatePopUp();
@@ -140,6 +163,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Alert dialog with app info
     private void inflatePopUp() {
         new AlertDialog.Builder(this, R.style.MyDialogTheme)
                 .setTitle("About")
@@ -188,6 +212,7 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
+    // Open a html boilerplate from the assets folder
     private void openTemplate() {
         BufferedReader bufferedReader = null;
 
@@ -202,6 +227,9 @@ public class MainActivity extends AppCompatActivity {
             }
 
             mEditText.setText(stringBuilder.toString());
+            mUri = null;
+            mUriString = "";
+            savedSharedPreferences();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -239,12 +267,14 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == PICK_FILE && resultCode == RESULT_OK) {
-            uri = null;
+            mUri = null;
             if (data != null) {
-                uri = data.getData();
+                mUri = data.getData();
+                mUriString = mUri.toString();
+                savedSharedPreferences();
                 String fileContent = null;
                 try {
-                    fileContent = readTextFromUri(uri);
+                    fileContent = readTextFromUri(mUri);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -252,11 +282,13 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "File opened successfully", Toast.LENGTH_LONG).show();
             }
         } else if (requestCode == CREATE_FILE && resultCode == RESULT_OK) {
-            uri = null;
+            mUri = null;
             if (data != null) {
-                uri = data.getData();
+                mUri = data.getData();
+                mUriString = mUri.toString();
+                savedSharedPreferences();
                 String content = mEditText.getText().toString();
-                alterDocument(uri, content);
+                alterDocument(mUri, content);
             }
         }
     }
@@ -293,5 +325,13 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return stringBuilder.toString();
+    }
+
+    private void savedSharedPreferences() {
+        // get and editor for the SharePreferences object
+        mSharedPreferences = getSharedPreferences(mSharedPreferencesFile, MODE_PRIVATE);
+        SharedPreferences.Editor sharedPreferencesEditor = mSharedPreferences.edit();
+        sharedPreferencesEditor.putString("URI", mUriString);
+        sharedPreferencesEditor.apply();
     }
 }
