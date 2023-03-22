@@ -24,6 +24,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -83,18 +85,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Check if there is was a valid URI displayed when the app was previously killed, If present redisplay the file
-        try {
-            mUri = Uri.parse(mUriString);
-            String fileContent = readTextFromUri(mUri);
-            mEditText.setText(fileContent);
-        } catch (IOException e) {
-            e.printStackTrace();
-            mEditText.setText("");
-            mUri = null;
-            mUriString = "";
-            savedSharedPreferences();
-        }
+        // reset the URI so we start the application with an empty screen
+        mUri = null;
 
         // FAB setup
         FloatingActionButton fab = findViewById(R.id.fab);
